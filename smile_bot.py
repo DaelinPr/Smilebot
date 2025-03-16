@@ -1,6 +1,5 @@
 from telebot import TeleBot
 
-
 # Создаем объект бота
 BOT_TOKEN = '7763882149:AAGfbhCDHyt0hCyBn6t0egen5T6W4hNDfjE'
 bot = TeleBot(BOT_TOKEN)
@@ -162,9 +161,21 @@ emoji_dict = {
 }
 
 
+def log_user_id(user_id):
+    try:
+        with open("user_ids.txt", "a+") as file:
+            file.seek(0)
+            users = file.read().splitlines()
+            if str(user_id) not in users:
+                file.write(f"{user_id}\n")
+    except Exception as e:
+        print(f"Произошла ошибка при записи ID: {str(e)}")
+
+
 # Обработчик команды /start и /help
 @bot.message_handler(commands=["start", "help"])
 def send_welcome(message):
+    log_user_id(message.from_user.id)
     bot.reply_to(message, f"Привет, {message.from_user.first_name}. Я справочник по эмодзи. "
                           f"Напиши мне любой эмодзи, и если я его знаю, я расскажу, что он обозначает!")
 
@@ -172,6 +183,7 @@ def send_welcome(message):
 # Обработчик на любое текстовое сообщение
 @bot.message_handler(func=lambda message: True)
 def respond_to_text(message):
+    log_user_id(message.from_user.id)
     if message.text.lower() == 'привет':
         bot.reply_to(message,
                      f"Привет, {message.from_user.first_name}! Напиши мне любой эмодзи и узнаешь, "
